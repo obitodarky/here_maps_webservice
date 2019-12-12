@@ -25,8 +25,18 @@ class _ReverseGeoCodingState extends State<ReverseGeoCoding> {
         title: Text("Reverse GeoCoding"),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
+          DropdownButton<Container>(
+            items: <Container>[
+              getContainer(ReverseGeoCodeModes.retrieveAddresses, "Get Addresses"),
+      ].map<DropdownMenuItem<Container>>((Container value){
+                return DropdownMenuItem<Container>(
+                  child: value
+                );
+            }).toList()
+          ),
           Container(
             alignment: Alignment.center,
             child: Text(currentLocation!=null?
@@ -39,13 +49,13 @@ class _ReverseGeoCodingState extends State<ReverseGeoCoding> {
             padding: EdgeInsets.all(24),
             alignment: Alignment.center,
             child: Text(address??"Loading"),
-          )
+          ),
         ],
       ),
     );
   }
 
-  void doReverseGeoCoding() async {
+  void doReverseGeoCoding({ReverseGeoCodeModes geoCodeMode = ReverseGeoCodeModes.retrieveAreas}) async {
     var location = new l.Location();
 
     try {
@@ -56,7 +66,7 @@ class _ReverseGeoCodingState extends State<ReverseGeoCoding> {
         });
       });
       HereMaps(apiKey: "your apiKey")
-          .reverseGeoCode(mode: ReverseGeoCodeModes.retrieveAreas,
+          .reverseGeoCode(mode: geoCodeMode,
               lat: currentLocation.latitude, lon: currentLocation.longitude)
           .then((response) {
         print(response);
@@ -70,5 +80,18 @@ class _ReverseGeoCodingState extends State<ReverseGeoCoding> {
         print("Permission Dennied");
       }
     }
+  }
+  getContainer(ReverseGeoCodeModes geoCodeMode, String text){
+    return  Container(
+      padding: EdgeInsets.only(bottom: 20),
+      child: FlatButton(
+        onPressed: (){
+          address = "Loading";
+          doReverseGeoCoding(geoCodeMode: geoCodeMode);
+        },
+        child: Text(text, style: TextStyle(color: Colors.white),),
+        color: Colors.blueAccent,
+      ),
+    );
   }
 }
